@@ -1,5 +1,6 @@
 /tmp
 /out-tsc
+/.svelte-kit
 
 /node_modules
 npm-debug.log*
