@@ -1,5 +1,5 @@
-import { BinaryThree } from "../../../dataStructures/BinaryThree/BinaryThree";
-import type { Node } from "../../../dataStructures/BinaryThree/Node";
+import { BinaryTree } from "$dataStructures/BinaryTree/BinaryTree.ts";
+import type { Node } from "$dataStructures/BinaryTree/Node";
 export interface VisualNode {
 	value: number;
 	x: number;
@@ -44,7 +44,10 @@ function computeLayout(
 }
 
 // Generic: converts an ordered list of visited values into traversal edges between their visual positions
-export function buildTraversalEdges(visitOrder: number[], nodes: VisualNode[]): TraversalEdge[] {
+export function buildTraversalEdges(
+	visitOrder: number[],
+	nodes: VisualNode[],
+): TraversalEdge[] {
 	const edges: TraversalEdge[] = [];
 	const nodeMap = new Map(nodes.map((n) => [n.value, n]));
 
@@ -59,8 +62,8 @@ export function buildTraversalEdges(visitOrder: number[], nodes: VisualNode[]): 
 	return edges;
 }
 
-class BinaryThreeStore {
-	private tree = new BinaryThree<number>();
+class BinaryTreeStore {
+	private tree = new BinaryTree<number>();
 	private canvasWidth = $state(800);
 	private timer: ReturnType<typeof setInterval> | null = null;
 	private allTraversalEdges: TraversalEdge[] = [];
@@ -79,13 +82,29 @@ class BinaryThreeStore {
 		this.#recompute();
 	}
 
-	startTraversal() {
+	reset() {
+		this.tree = new BinaryTree<number>();
+		if (this.timer) {
+			clearInterval(this.timer);
+		}
+		this.allTraversalEdges = [];
+		this.nodes = [];
+		this.isPlaying = false;
+		this.#recompute();
+	}
+
+	startTraversal(mode: "stepByStep" | "allAtOnce" = "stepByStep") {
 		this.stopTraversal();
 
 		const visitOrder: number[] = [];
 		this.tree.inOrder((value) => visitOrder.push(value));
-
 		this.allTraversalEdges = buildTraversalEdges(visitOrder, this.nodes);
+
+		if (mode === "allAtOnce") {
+			this.visibleTraversalEdges = this.allTraversalEdges;
+			return;
+		}
+
 		this.visibleTraversalEdges = [];
 		this.isPlaying = true;
 
@@ -117,4 +136,4 @@ class BinaryThreeStore {
 	}
 }
 
-export const binaryThreeStore = new BinaryThreeStore();
+export const binaryThreeStore = new BinaryTreeStore();

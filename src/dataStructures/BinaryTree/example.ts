@@ -1,6 +1,6 @@
-import { BinaryThree } from "./BinaryThree";
+import { BinaryTree } from "./BinaryTree.ts";
 
-const binaryThree = new BinaryThree<number>();
+const binaryThree = new BinaryTree<number>();
 
 binaryThree.insert(5);
 binaryThree.insert(9);

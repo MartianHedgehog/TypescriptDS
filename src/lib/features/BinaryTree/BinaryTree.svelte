@@ -1,8 +1,9 @@
 <script lang="ts">
-import { browser } from "$app/environment";
 import { Arrow, Circle, Layer, Line, Stage, Text } from "svelte-konva";
+import { browser } from "$app/environment";
 import { useCssVar } from "$lib/theme.svelte.ts";
-import { binaryThreeStore } from "./binaryThreeStore.svelte";
+import AppLayout from "$lib/ui/AppLayout.svelte";
+import { binaryThreeStore } from "./binaryTreeStore.svelte.js";
 
 const RADIUS = 24;
 
@@ -12,6 +13,7 @@ const edgeStroke = useCssVar("--color-base-300", "#94a3b8");
 const traversalColor = useCssVar("--color-secondary", "#f59e0b");
 
 let inputValue = $state("");
+let traversalMode = $state<"stepByStep" | "allAtOnce">("stepByStep");
 let canvasWidth = $state(0);
 let canvasHeight = $state(0);
 
@@ -42,41 +44,62 @@ function edgePoints(px: number, py: number, cx: number, cy: number): number[] {
 }
 </script>
 
-<div class="flex flex-row h-full">
-	<!-- Sidebar -->
-	<aside class="flex flex-col gap-6 p-4 w-64 border-r border-base-300">
-		<div class="flex flex-col gap-2">
-			<h2 class="text-lg font-bold">Insert</h2>
+<AppLayout title="Binary Search Tree">
+	{#snippet sidebar()}
+		<div class="flex flex-col gap-4">
+			<span class="font-bold">Insert</span>
+
 			<input
 				class="input input-bordered w-full"
 				type="number"
+				min="0"
 				placeholder="Value"
 				bind:value={inputValue}
 				onkeydown={(e) => e.key === "Enter" && handleInsert()}
 			/>
+
 			<button class="btn btn-primary w-full" onclick={handleInsert}>Insert</button>
 		</div>
 
-		<div class="flex flex-col gap-2">
-			<h2 class="text-lg font-bold">Traversal</h2>
+		<div class="divider"></div>
+
+		<div class="flex flex-col gap-4">
+			<span class="font-bold">Traversal</span>
+
+			<span class="text-sm text-base-content/60">In Order</span>
+
+			<div class="flex flex-col gap-1">
+				<label class="label cursor-pointer justify-start gap-3">
+					<input type="radio" class="radio radio-sm" bind:group={traversalMode} value="stepByStep" />
+					<span class="label-text">Step by step</span>
+				</label>
+				<label class="label cursor-pointer justify-start gap-3">
+					<input type="radio" class="radio radio-sm" bind:group={traversalMode} value="allAtOnce" />
+					<span class="label-text">All at once</span>
+				</label>
+			</div>
+
 			{#if binaryThreeStore.isPlaying}
-				<button class="btn btn-error w-full" onclick={() => binaryThreeStore.stopTraversal()}>
-					Stop
-				</button>
+				<button class="btn btn-error w-full" onclick={() => binaryThreeStore.stopTraversal()}>Stop</button>
+			{:else if binaryThreeStore.visibleTraversalEdges.length > 0}
+				<button class="btn btn-error w-full" onclick={() => binaryThreeStore.stopTraversal()}>Hide</button>
 			{:else}
-				<button class="btn btn-outline w-full" onclick={() => binaryThreeStore.startTraversal()}>
-					Start
+				<button class="btn btn-outline btn-accent w-full" onclick={() => binaryThreeStore.startTraversal(traversalMode)}>
+					{traversalMode === "allAtOnce" ? "Show" : "Start"}
 				</button>
 			{/if}
 		</div>
-	</aside>
 
-	<!-- Canvas area -->
-	<div class="flex-1" bind:clientWidth={canvasWidth} bind:clientHeight={canvasHeight}>
+		<div class="divider"></div>
+
+		<button class="btn btn-outline btn-error w-full" onclick={() => binaryThreeStore.reset()}>Reset</button>
+	{/snippet}
+
+	<!-- Canvas -->
+	<div class="h-full" bind:clientWidth={canvasWidth} bind:clientHeight={canvasHeight}>
 		{#if browser && canvasWidth > 0}
 			<Stage width={canvasWidth} height={canvasHeight}>
 				<Layer>
-					<!-- Tree edges -->
 					{#each binaryThreeStore.nodes as node}
 						{#if node.parentX !== null && node.parentY !== null}
 							<Line
@@ -87,7 +110,6 @@ function edgePoints(px: number, py: number, cx: number, cy: number): number[] {
 						{/if}
 					{/each}
 
-					<!-- Traversal arrows -->
 					{#each binaryThreeStore.visibleTraversalEdges as edge}
 						<Arrow
 							points={edgePoints(edge.fromX, edge.fromY, edge.toX, edge.toY)}
@@ -100,7 +122,6 @@ function edgePoints(px: number, py: number, cx: number, cy: number): number[] {
 						/>
 					{/each}
 
-					<!-- Nodes -->
 					{#each binaryThreeStore.nodes as node}
 						<Circle
 							x={node.x}
@@ -124,4 +145,4 @@ function edgePoints(px: number, py: number, cx: number, cy: number): number[] {
 			</Stage>
 		{/if}
 	</div>
-</div>
+</AppLayout>

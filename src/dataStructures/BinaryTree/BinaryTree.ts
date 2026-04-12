@@ -1,6 +1,6 @@
 import { Node } from "./Node";
 
-export class BinaryThree<T> {
+export class BinaryTree<T> {
 	private root: Node<T> | null;
 
 	constructor() {
