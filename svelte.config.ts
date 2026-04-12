@@ -7,7 +7,8 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		alias: {
-			$lib: "./src/lib", // Дозволяє писати import з будь-якого місця
+			$lib: "./src/lib",
+			$dataStructures: "./src/dataStructures",
 		},
 	},
 };

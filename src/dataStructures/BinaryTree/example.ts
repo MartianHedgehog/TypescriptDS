@@ -10,6 +10,6 @@ binaryThree.insert(7);
 binaryThree.insert(8);
 binaryThree.insert(10);
 binaryThree.insert(150);
-binaryThree.printInOrder();
+binaryThree.inOrder((value) => console.log(value));
 
 export { binaryThree as exampleBinaryThree };

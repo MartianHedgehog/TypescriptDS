@@ -1,6 +1,6 @@
 <script lang="ts">
 import { browser } from "$app/environment";
-import { Circle, Layer, Line, Stage, Text } from "svelte-konva";
+import { Arrow, Circle, Layer, Line, Stage, Text } from "svelte-konva";
 import { useCssVar } from "$lib/theme.svelte.ts";
 import { binaryThreeStore } from "./binaryThreeStore.svelte";
 
@@ -9,6 +9,7 @@ const RADIUS = 24;
 const nodeStroke = useCssVar("--color-primary", "#4338ca");
 const nodeText = useCssVar("--color-base-content", "#1f2937");
 const edgeStroke = useCssVar("--color-base-300", "#94a3b8");
+const traversalColor = useCssVar("--color-secondary", "#f59e0b");
 
 let inputValue = $state("");
 let canvasWidth = $state(0);
@@ -43,9 +44,9 @@ function edgePoints(px: number, py: number, cx: number, cy: number): number[] {
 
 <div class="flex flex-row h-full">
 	<!-- Sidebar -->
-	<aside class="flex flex-col gap-4 p-4 w-64 border-r border-base-300">
-		<h2 class="text-lg font-bold">Binary Search Tree</h2>
+	<aside class="flex flex-col gap-6 p-4 w-64 border-r border-base-300">
 		<div class="flex flex-col gap-2">
+			<h2 class="text-lg font-bold">Insert</h2>
 			<input
 				class="input input-bordered w-full"
 				type="number"
@@ -55,6 +56,19 @@ function edgePoints(px: number, py: number, cx: number, cy: number): number[] {
 			/>
 			<button class="btn btn-primary w-full" onclick={handleInsert}>Insert</button>
 		</div>
+
+		<div class="flex flex-col gap-2">
+			<h2 class="text-lg font-bold">Traversal</h2>
+			{#if binaryThreeStore.isPlaying}
+				<button class="btn btn-error w-full" onclick={() => binaryThreeStore.stopTraversal()}>
+					Stop
+				</button>
+			{:else}
+				<button class="btn btn-outline w-full" onclick={() => binaryThreeStore.startTraversal()}>
+					Start
+				</button>
+			{/if}
+		</div>
 	</aside>
 
 	<!-- Canvas area -->
@@ -62,7 +76,7 @@ function edgePoints(px: number, py: number, cx: number, cy: number): number[] {
 		{#if browser && canvasWidth > 0}
 			<Stage width={canvasWidth} height={canvasHeight}>
 				<Layer>
-					<!-- Edges (drawn first, behind nodes) -->
+					<!-- Tree edges -->
 					{#each binaryThreeStore.nodes as node}
 						{#if node.parentX !== null && node.parentY !== null}
 							<Line
@@ -71,6 +85,19 @@ function edgePoints(px: number, py: number, cx: number, cy: number): number[] {
 								strokeWidth={2}
 							/>
 						{/if}
+					{/each}
+
+					<!-- Traversal arrows -->
+					{#each binaryThreeStore.visibleTraversalEdges as edge}
+						<Arrow
+							points={edgePoints(edge.fromX, edge.fromY, edge.toX, edge.toY)}
+							stroke={traversalColor.value}
+							fill={traversalColor.value}
+							strokeWidth={2}
+							dash={[8, 4]}
+							pointerLength={10}
+							pointerWidth={8}
+						/>
 					{/each}
 
 					<!-- Nodes -->

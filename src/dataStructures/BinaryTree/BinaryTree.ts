@@ -19,11 +19,9 @@ export class BinaryThree<T> {
 		this.insertNode(this.root!, newNode);
 	}
 
-	public printInOrder() {
+	public inOrder(callback: (value: T) => void) {
 		if (!this.isEmpty()) {
-			console.log("<----------PRINT_IN_ORDER---------->");
-			this.inOrderTraversal(this.root!);
-			console.log("<----------PRINT_IN_ORDER---------->");
+			this.inOrderTraversal(this.root!, callback);
 		}
 	}
 
@@ -62,20 +60,20 @@ export class BinaryThree<T> {
 		return this.root === null;
 	}
 
-	private inOrderTraversal(root: Node<T>) {
+	private inOrderTraversal(root: Node<T>, callback: (value: T) => void) {
 		if (root) {
 			const rootLeftNode = root.getLeftNode();
 
 			if (rootLeftNode) {
-				this.inOrderTraversal(rootLeftNode);
+				this.inOrderTraversal(rootLeftNode, callback);
 			}
 
-			console.log(root.getValue());
+			callback(root.getValue()!);
 
 			const rootRightNode = root.getRightNode();
 
 			if (rootRightNode) {
-				this.inOrderTraversal(rootRightNode);
+				this.inOrderTraversal(rootRightNode, callback);
 			}
 		}
 	}

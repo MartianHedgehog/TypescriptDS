@@ -59,4 +59,5 @@ bun run preview   # preview production build
 
 ## Path Aliases
 
-- `$lib` → `./src/lib` (use for shared utilities and components)
+- `$lib` → `./src/lib` (shared utilities and components)
+- `$dataStructures` → `./src/dataStructures` (pure TS data structure implementations)
